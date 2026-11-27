@@ -27,9 +27,9 @@
           <span style="font-weight:600">{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="condition" label="条件表达式 (Aviator)">
+      <el-table-column label="条件表达式 (Aviator)">
         <template #default="{ row }">
-          <code class="rc-code">{{ row.condition }}</code>
+          <code class="rc-code">{{ row.expression }}</code>
         </template>
       </el-table-column>
       <el-table-column prop="hitScore" label="命中分" width="90" />
@@ -62,37 +62,7 @@
       </template>
     </el-table>
 
-    <el-dialog v-model="editVisible" :title="isCreate ? '新建规则' : '编辑规则'" width="560">
-      <el-form :model="form" label-width="110px">
-        <el-form-item label="规则ID">
-          <el-input v-model="form.ruleId" :disabled="!isCreate" placeholder="如 rule-night" />
-        </el-form-item>
-        <el-form-item label="名称">
-          <el-input v-model="form.name" placeholder="如 夜间交易" />
-        </el-form-item>
-        <el-form-item label="条件表达式">
-          <el-input v-model="form.condition" type="textarea" :rows="3"
-            placeholder="Aviator 表达式，如&#10;amount > 10000 && scene == 'WITHDRAW'" />
-        </el-form-item>
-        <el-form-item label="命中分数">
-          <el-input-number v-model="form.hitScore" :min="0" :max="100" />
-        </el-form-item>
-        <el-form-item label="命中动作">
-          <el-select v-model="form.hitAction" style="width: 160px">
-            <el-option label="PASS 放行" value="PASS" />
-            <el-option label="REVIEW 人工审核" value="REVIEW" />
-            <el-option label="REJECT 拒绝" value="REJECT" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="启用">
-          <el-switch v-model="form.enabled" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="editVisible = false">取消</el-button>
-        <el-button type="primary" @click="save">保存</el-button>
-      </template>
-    </el-dialog>
+    <RuleEditDialog v-model="editVisible" :rule="editingRule" @saved="load" />
 
     <el-dialog v-model="tryVisible" :title="`试跑规则: ${tryRuleId}`" width="640">
       <el-input v-model="tryInputJson" type="textarea" :rows="8" placeholder='入参 JSON，如 {"amount": 15000, "scene": "WITHDRAW"}' />
@@ -119,11 +89,11 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listRules, saveRule, deleteRule, tryRule } from '../api'
+import RuleEditDialog from '../components/RuleEditDialog.vue'
 
 const rules = ref([])
 const editVisible = ref(false)
-const isCreate = ref(false)
-const form = ref({})
+const editingRule = ref(null)
 const tryVisible = ref(false)
 const tryRuleId = ref('')
 const tryInputJson = ref('{}')
@@ -137,26 +107,13 @@ async function load() {
 }
 
 function openCreate() {
-  isCreate.value = true
-  form.value = { ruleId: '', name: '', condition: '', hitScore: 10, hitAction: 'REVIEW', enabled: true }
+  editingRule.value = null
   editVisible.value = true
 }
 
 function openEdit(row) {
-  isCreate.value = false
-  form.value = { ...row }
+  editingRule.value = row
   editVisible.value = true
-}
-
-async function save() {
-  if (!form.value.ruleId || !form.value.condition) {
-    ElMessage.warning('规则ID 和条件表达式不能为空')
-    return
-  }
-  await saveRule(form.value)
-  ElMessage.success('已保存')
-  editVisible.value = false
-  await load()
 }
 
 async function toggleEnabled(row) {

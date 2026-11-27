@@ -22,11 +22,14 @@ class FlowEngineTest {
 
     @BeforeEach
     void setUp() {
-        ruleStore = new RuleStore();
+        VarStore varStore = new VarStore();
+        varStore.init();
+        ruleStore = new RuleStore(varStore);
         ruleStore.init();
         ScriptStore scriptStore = new ScriptStore();
         scriptStore.init();
-        engine = new FlowEngine(ruleStore, scriptStore, new GroovyScriptEngine());
+        engine = new FlowEngine(ruleStore, scriptStore, new GroovyScriptEngine(),
+                new VariableResolver(varStore));
     }
 
     @Test
@@ -108,6 +111,33 @@ class FlowEngineTest {
         assertThat(r.getDecision()).isEqualTo("REVIEW");
     }
 
+    @Test
+    void structRuleHitsWhenAmountOverSceneThreshold() {
+        FlowRunResult r = engine.run(flow(node("n1", "rule-struct-big", "CONTINUE")),
+                input("amount", 15000, "thresholds", nested("bigAmount", 10000)));
+
+        assertThat(r.getTrace().get(0).getHit()).isTrue();
+        assertThat(r.getDecision()).isEqualTo("REVIEW");
+        assertThat(r.getTotalScore()).isEqualTo(50);
+    }
+
+    @Test
+    void structRuleSkipsWhenSceneThresholdIsHigher() {
+        FlowRunResult r = engine.run(flow(node("n1", "rule-struct-big", "CONTINUE")),
+                input("amount", 15000, "thresholds", nested("bigAmount", 20000)));
+
+        assertThat(r.getTrace().get(0).getHit()).isFalse();
+        assertThat(r.getDecision()).isEqualTo("PASS");
+    }
+
+    @Test
+    void structRuleWithoutThresholdFieldDoesNotHit() {
+        FlowRunResult r = engine.run(flow(node("n1", "rule-struct-big", "CONTINUE")),
+                input("amount", 15000));
+
+        assertThat(r.getTrace().get(0).getHit()).isFalse();
+    }
+
     private FlowInfo demoFlow() {
         FlowInfo f = new FlowInfo();
         f.setFlowId("flow-x");
@@ -162,6 +192,12 @@ class FlowEngineTest {
         for (int i = 0; i < kv.length; i += 2) {
             m.put((String) kv[i], kv[i + 1]);
         }
+        return m;
+    }
+
+    private Map<String, Object> nested(String k, Object v) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put(k, v);
         return m;
     }
 }

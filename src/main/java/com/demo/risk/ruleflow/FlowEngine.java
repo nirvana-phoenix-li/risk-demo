@@ -31,11 +31,14 @@ public class FlowEngine {
     private final RuleStore ruleStore;
     private final ScriptStore scriptStore;
     private final GroovyScriptEngine scriptEngine;
+    private final VariableResolver variableResolver;
 
-    public FlowEngine(RuleStore ruleStore, ScriptStore scriptStore, GroovyScriptEngine scriptEngine) {
+    public FlowEngine(RuleStore ruleStore, ScriptStore scriptStore, GroovyScriptEngine scriptEngine,
+                      VariableResolver variableResolver) {
         this.ruleStore = ruleStore;
         this.scriptStore = scriptStore;
         this.scriptEngine = scriptEngine;
+        this.variableResolver = variableResolver;
         AviatorEvaluator.getInstance().setOption(Options.NIL_WHEN_PROPERTY_NOT_FOUND, true);
     }
 
@@ -89,9 +92,13 @@ public class FlowEngine {
             return new EvalOutcome(new TraceItem(node.getNodeId(), rule.getName(), "RULE",
                     node.getRefId(), null, 0, 0, "规则已停用，跳过"));
         }
+        String expression = "STRUCT".equals(rule.getRuleType())
+                ? ExpressionBuilder.build(rule)
+                : rule.getCondition();
         boolean hit;
         try {
-            Object result = AviatorEvaluator.execute(rule.getCondition(), input, true);
+            Map<String, Object> env = variableResolver.resolve(input);
+            Object result = AviatorEvaluator.execute(expression, env, true);
             hit = Boolean.TRUE.equals(result);
         } catch (ExpressionRuntimeException e) {
             throw new RuleFlowException("规则[" + rule.getName() + "]条件执行失败: " + e.getMessage());

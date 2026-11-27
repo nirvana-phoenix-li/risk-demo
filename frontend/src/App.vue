@@ -23,6 +23,13 @@
           </svg>
           <span>规则配置</span>
         </el-menu-item>
+        <el-menu-item index="/vars">
+          <svg class="mi" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7V5h3M20 7V5h-3M4 17v2h3M20 17v2h-3"/>
+            <path d="M9 10a2 2 0 0 1 4 0v4a2 2 0 0 0 4 0"/>
+          </svg>
+          <span>变量管理</span>
+        </el-menu-item>
         <el-menu-item index="/flows">
           <svg class="mi" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="6" height="6" rx="1.5"/>
@@ -30,6 +37,16 @@
             <path d="M9 6h6a2 2 0 0 1 2 2v4m0 0-2-2m2 2 2-2"/>
           </svg>
           <span>流程编排</span>
+        </el-menu-item>
+        <el-menu-item index="/field">
+          <svg class="mi" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 4H5a1 1 0 0 0-1 1v3"/>
+            <path d="M16 4h3a1 1 0 0 1 1 1v3"/>
+            <path d="M20 16v3a1 1 0 0 1-1 1h-3"/>
+            <path d="M8 20H5a1 1 0 0 1-1-1v-3"/>
+            <path d="M8 12h8M12 8v8"/>
+          </svg>
+          <span>字段补全</span>
         </el-menu-item>
       </el-menu>
 

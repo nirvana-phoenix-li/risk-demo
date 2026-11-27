@@ -19,7 +19,9 @@ class RuleStoreFlowStoreTest {
 
     @BeforeEach
     void setUp() {
-        ruleStore = new RuleStore();
+        VarStore varStore = new VarStore();
+        varStore.init();
+        ruleStore = new RuleStore(varStore);
         ruleStore.init();
         flowStore = new FlowStore();
         flowStore.init();

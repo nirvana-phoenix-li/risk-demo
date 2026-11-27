@@ -19,6 +19,8 @@
         </el-select>
         <el-button @click="openCreate">新建流程</el-button>
         <el-button type="danger" plain :disabled="!currentFlowId" @click="removeFlow">删除流程</el-button>
+        <el-divider direction="vertical" />
+        <el-button type="primary" plain @click="openRuleCreate">+ 新建规则</el-button>
       </div>
       <div class="right">
         <el-button type="success" :disabled="!currentFlowId" @click="openRun">运行</el-button>
@@ -58,8 +60,9 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="170">
-          <template #default="{ $index }">
+        <el-table-column label="操作" width="250">
+          <template #default="{ row, $index }">
+            <el-button v-if="row.type === 'RULE'" size="small" type="primary" plain @click="openRuleEdit(row)">编辑规则</el-button>
             <el-button size="small" :disabled="$index === 0" @click="move($index, -1)">上移</el-button>
             <el-button size="small" :disabled="$index === nodes.length - 1" @click="move($index, 1)">下移</el-button>
             <el-button size="small" type="danger" @click="nodes.splice($index, 1)">删除</el-button>
@@ -131,6 +134,8 @@
         <el-button type="primary" @click="run">执行</el-button>
       </template>
     </el-dialog>
+
+    <RuleEditDialog v-model="ruleEditVisible" :rule="editingRule" @saved="loadRules" />
   </el-card>
 </template>
 
@@ -138,6 +143,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listFlows, getFlow, saveFlow, deleteFlow, runFlow, listRules, listScripts } from '../api'
+import RuleEditDialog from '../components/RuleEditDialog.vue'
 
 const flows = ref([])
 const rules = ref([])
@@ -152,6 +158,22 @@ const runVisible = ref(false)
 const runInputJson = ref('{}')
 const runResult = ref(null)
 const runError = ref('')
+const ruleEditVisible = ref(false)
+const editingRule = ref(null)
+
+async function loadRules() {
+  rules.value = await listRules()
+}
+
+function openRuleEdit(row) {
+  editingRule.value = rules.value.find(r => r.ruleId === row.refId) || { ruleId: row.refId, name: '' }
+  ruleEditVisible.value = true
+}
+
+function openRuleCreate() {
+  editingRule.value = null
+  ruleEditVisible.value = true
+}
 
 const decisionTag = d => ({ REJECT: 'danger', REVIEW: 'warning', PASS: 'success' }[d] || 'info')
 const decisionClass = d => ({ REJECT: 'is-reject', REVIEW: 'is-review', PASS: 'is-pass' }[d] || 'is-info')

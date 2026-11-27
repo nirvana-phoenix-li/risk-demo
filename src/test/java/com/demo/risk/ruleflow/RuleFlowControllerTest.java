@@ -21,14 +21,18 @@ class RuleFlowControllerTest {
 
     @BeforeEach
     void setUp() {
-        RuleStore ruleStore = new RuleStore();
+        VarStore varStore = new VarStore();
+        varStore.init();
+        RuleStore ruleStore = new RuleStore(varStore);
         ruleStore.init();
         FlowStore flowStore = new FlowStore();
         flowStore.init();
         ScriptStore scriptStore = new ScriptStore();
         scriptStore.init();
-        FlowEngine flowEngine = new FlowEngine(ruleStore, scriptStore, new GroovyScriptEngine());
-        controller = new RuleFlowController(ruleStore, flowStore, flowEngine);
+        FlowEngine flowEngine = new FlowEngine(ruleStore, scriptStore, new GroovyScriptEngine(),
+                new VariableResolver(varStore));
+        controller = new RuleFlowController(ruleStore, flowStore, flowEngine, varStore,
+                new VariableResolver(varStore));
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.demo.risk.common.Result;
 import com.demo.risk.ruleflow.model.FlowInfo;
 import com.demo.risk.ruleflow.model.FlowRunResult;
 import com.demo.risk.ruleflow.model.RuleInfo;
+import com.demo.risk.ruleflow.model.VariableInfo;
 import com.googlecode.aviator.AviatorEvaluator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,11 +26,37 @@ public class RuleFlowController {
     private final RuleStore ruleStore;
     private final FlowStore flowStore;
     private final FlowEngine flowEngine;
+    private final VarStore varStore;
+    private final VariableResolver variableResolver;
 
-    public RuleFlowController(RuleStore ruleStore, FlowStore flowStore, FlowEngine flowEngine) {
+    public RuleFlowController(RuleStore ruleStore, FlowStore flowStore, FlowEngine flowEngine,
+                              VarStore varStore, VariableResolver variableResolver) {
         this.ruleStore = ruleStore;
         this.flowStore = flowStore;
         this.flowEngine = flowEngine;
+        this.varStore = varStore;
+        this.variableResolver = variableResolver;
+    }
+
+    // ---------- 变量 ----------
+
+    @PostMapping("/vars")
+    public Result<VariableInfo> saveVar(@Validated @RequestBody VariableInfo info) {
+        varStore.save(info);
+        return Result.ok(info);
+    }
+
+    @GetMapping("/vars")
+    public Result<List<VariableInfo>> listVars() {
+        return Result.ok(varStore.list());
+    }
+
+    @DeleteMapping("/vars/{varId}")
+    public Result<String> deleteVar(@PathVariable String varId) {
+        if (varStore.delete(varId) == null) {
+            return Result.fail(404, "变量不存在: " + varId);
+        }
+        return Result.ok("已删除: " + varId);
     }
 
     // ---------- 规则 ----------
@@ -62,13 +89,20 @@ public class RuleFlowController {
     public Result<Map<String, Object>> tryRule(@PathVariable String ruleId,
                                                @RequestBody Map<String, Object> input) {
         RuleInfo rule = ruleStore.require(ruleId);
+        boolean struct = "STRUCT".equals(rule.getRuleType());
+        String expression = struct ? ExpressionBuilder.build(rule) : rule.getCondition();
+        Map<String, Object> env = variableResolver.resolve(input);
+
         Map<String, Object> result = new LinkedHashMap<>();
-        Object eval = AviatorEvaluator.execute(rule.getCondition(), input, true);
+        Object eval = AviatorEvaluator.execute(expression, env, true);
         boolean hit = Boolean.TRUE.equals(eval);
         result.put("hit", hit);
         result.put("hitScore", hit ? rule.getHitScore() : 0);
         result.put("hitAction", hit ? rule.getHitAction() : null);
-        result.put("condition", rule.getCondition());
+        result.put("condition", expression);
+        if (struct) {
+            result.put("resolvedVars", env);
+        }
         result.put("input", input);
         return Result.ok(result);
     }
