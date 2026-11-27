@@ -1,11 +1,18 @@
 package com.demo.risk.common;
 
+import com.demo.risk.fieldcomplete.GroovyScriptException;
+import com.demo.risk.ruleflow.RuleFlowException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler({GroovyScriptException.class, RuleFlowException.class, IllegalArgumentException.class})
+    public Result<Void> handleGroovy(GroovyScriptException e) {
+        return Result.fail(400, e.getMessage());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result<Void> handleValidation(MethodArgumentNotValidException e) {

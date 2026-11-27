@@ -1,0 +1,197 @@
+/* ==========================================================
+   风控系统 · 全局主题
+   纯 CSS 变量定制 Element Plus，无额外依赖
+   ========================================================== */
+
+:root {
+  /* 品牌色 */
+  --rc-primary: #4f46e5;
+  --rc-primary-light: #6366f1;
+  --rc-primary-lighter: #eef2ff;
+  --rc-sidebar-w: 236px;
+  --rc-radius: 14px;
+  --rc-radius-sm: 8px;
+  --rc-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -16px rgba(15, 23, 42, 0.14);
+  --rc-shadow-card-hover: 0 2px 4px rgba(15, 23, 42, 0.05), 0 20px 44px -18px rgba(79, 70, 229, 0.28);
+}
+
+/* ---------- Element Plus 主题色覆盖（indigo 色阶） ---------- */
+:root {
+  --el-color-primary: #4f46e5;
+  --el-color-primary-light-3: #7c74ed;
+  --el-color-primary-light-5: #9a93f2;
+  --el-color-primary-light-7: #bebaf7;
+  --el-color-primary-light-8: #d5d2fa;
+  --el-color-primary-light-9: #eef2ff;
+  --el-color-primary-dark-2: #3f38c2;
+  --el-border-radius-base: 8px;
+}
+
+/* ---------- 全局基础 ---------- */
+html, body, #app { height: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 全局滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ---------- 卡片 ---------- */
+.el-card {
+  border: none;
+  border-radius: var(--rc-radius);
+  box-shadow: var(--rc-shadow-card);
+  transition: box-shadow 0.25s ease;
+}
+.el-card:hover { box-shadow: var(--rc-shadow-card-hover); }
+.el-card__body { padding: 22px 24px; }
+
+/* ---------- 表格 ---------- */
+.el-table {
+  --el-table-border-color: #f1f5f9;
+  --el-table-header-bg-color: #f8fafc;
+  --el-table-row-hover-bg-color: #f5f6ff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.el-table th.el-table__cell {
+  font-weight: 600;
+  color: #475569;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+.el-table .el-table__cell { padding: 10px 0; }
+.el-table--border .el-table__cell { border-right: none; }
+.el-table--border::after,
+.el-table--border::before { display: none; }
+.el-table--border { border: 1px solid #f1f5f9; }
+
+/* 表格空状态 */
+.el-table__empty-block { padding: 32px 0; }
+
+/* ---------- 对话框 ---------- */
+.el-dialog {
+  border-radius: 16px;
+  box-shadow: 0 24px 64px -16px rgba(15, 23, 42, 0.32);
+}
+.el-dialog__header {
+  padding: 20px 24px 14px;
+  margin-right: 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.el-dialog__title { font-size: 16px; font-weight: 700; color: #0f172a; }
+.el-dialog__body { padding: 20px 24px; }
+.el-dialog__footer { padding: 14px 24px 20px; border-top: 1px solid #f1f5f9; }
+
+/* ---------- 按钮 ---------- */
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+/* 实心主按钮：渐变（排除 plain/text 链接态） */
+.el-button--primary:not(.is-plain):not(.is-text):not(.is-link) {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  border: none;
+  box-shadow: 0 4px 12px -4px rgba(79, 70, 229, 0.5);
+}
+.el-button--primary:not(.is-plain):not(.is-text):not(.is-link):hover:not(.is-disabled) {
+  background: linear-gradient(135deg, #4338ca 0%, #5457e8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(79, 70, 229, 0.55);
+}
+.el-button--primary:not(.is-plain):not(.is-text):not(.is-link):active { transform: translateY(0); }
+/* plain 主按钮：浅色底描边 */
+.el-button--primary.is-plain {
+  background: var(--rc-primary-lighter);
+  border-color: #d5d2fa;
+  color: var(--rc-primary);
+}
+.el-button--primary.is-plain:hover:not(.is-disabled) {
+  background: #e0e7ff;
+  border-color: var(--rc-primary);
+  color: var(--rc-primary);
+  transform: translateY(-1px);
+}
+/* 禁用态降低透明度干扰 */
+.el-button.is-disabled { opacity: 0.55; }
+.el-button--success:not(.is-plain):not(.is-text):not(.is-link) {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  border: none;
+  box-shadow: 0 4px 12px -4px rgba(16, 185, 129, 0.45);
+}
+.el-button--success:not(.is-plain):not(.is-text):not(.is-link):hover:not(.is-disabled) {
+  background: linear-gradient(135deg, #047857 0%, #0ea572 100%);
+  transform: translateY(-1px);
+}
+
+/* ---------- 标签 ---------- */
+.el-tag { border-radius: 6px; font-weight: 600; border: none; padding: 0 10px; }
+.el-tag--danger { background: #fef2f2; color: #dc2626; }
+.el-tag--warning { background: #fffbeb; color: #d97706; }
+.el-tag--success { background: #ecfdf5; color: #059669; }
+.el-tag--primary { background: var(--rc-primary-lighter); color: var(--rc-primary); }
+.el-tag--info { background: #f1f5f9; color: #64748b; }
+.el-tag.el-tag--danger.el-tag--light { background: #fef2f2; color: #dc2626; }
+
+/* ---------- 表单 ---------- */
+.el-input__wrapper, .el-textarea__inner, .el-select__wrapper {
+  border-radius: 8px;
+}
+.el-form-item__label { color: #475569; font-weight: 500; }
+
+/* ---------- Switch ---------- */
+.el-switch.is-checked .el-switch__core {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  border-color: transparent;
+}
+
+/* ---------- 分页 / 消息 ---------- */
+.el-message { border-radius: 10px; border: none; box-shadow: var(--rc-shadow-card); }
+.el-message-box { border-radius: 14px; }
+.el-alert { border-radius: 10px; }
+
+/* ---------- 描述列表 ---------- */
+.el-descriptions__label { color: #64748b !important; font-weight: 500 !important; }
+.el-descriptions__body { background: #fff !important; }
+
+/* ---------- 代码块 ---------- */
+.rc-code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+  font-size: 12px;
+  background: var(--rc-primary-lighter);
+  color: #4338ca;
+  padding: 3px 8px;
+  border-radius: 6px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* ---------- 通用页头 ---------- */
+.rc-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+.rc-page-header .ph-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rc-page-header .ph-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #94a3b8;
+}
